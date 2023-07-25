@@ -1,4 +1,4 @@
-# react-native-reanimated-animated-accordion
+# react-native-reanimated-accordion
 A simple animated expandable section for react native apps using reanimated
 
 ### 🦄 Features
