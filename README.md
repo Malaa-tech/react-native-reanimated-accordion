@@ -8,13 +8,11 @@ A simple animated expandable section for react native apps using reanimated
 - ✅  Includes option to not render collapsed compnent. (For less rendring).
 - ✅  Uses Reanimated v3
 
-
-
 ### How we use it
 <p align="center">
-<img src="https://github.com/Malaa-tech/react-native-reanimated-animated-accordion/assets/24798045/a24aad4c-4720-42de-b022-91ee887c356f" width="270"/>
-<img src="https://github.com/Malaa-tech/react-native-reanimated-animated-accordion/assets/24798045/795b0255-a505-4e17-9688-4d84d6ffc17a" width="270"/>
-<img src="https://github.com/Malaa-tech/react-native-reanimated-animated-accordion/assets/24798045/f4ba5bbf-59d4-4ef1-840b-4dd055657548" width="270"/>
+<img src="https://github.com/Malaa-tech/react-native-reanimated-accordion/assets/24798045/a24aad4c-4720-42de-b022-91ee887c356f" width="270"/>
+<img src="https://github.com/Malaa-tech/react-native-reanimated-accordion/assets/24798045/795b0255-a505-4e17-9688-4d84d6ffc17a" width="270"/>
+<img src="https://github.com/Malaa-tech/react-native-reanimated-accordion/assets/24798045/f4ba5bbf-59d4-4ef1-840b-4dd055657548" width="270"/>
 </p>
 
 ## Installation
