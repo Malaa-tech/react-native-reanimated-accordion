@@ -57,7 +57,6 @@ yarn add react-native-reanimated-animated-accordion
   <View style={{ width: '100%' }}>
     <Expandable
       duration={speed}
-      renderWhenCollapsed={false}
       expanded={expanded}
     >
       <View style={{ width: '100%', padding: 20, paddingTop: 0 }}>
@@ -87,6 +86,22 @@ yarn add react-native-reanimated-animated-accordion
   </View>
 </View>
 ```
+
+
+## Reduce Rendering
+If you would like to prevent collapsed components from being rendered, just add a `renderWhenCollapsed={false}`.
+this can help if you have heavy collapsed compoennts as it may reduce your boot time + ram.
+
+```tsx | pure
+<Expandable
+  duration={speed}
+  renderWhenCollapsed={false}
+  expanded={expanded}
+>
+//
+</Expandable>
+```
+
 
 ## License
 
