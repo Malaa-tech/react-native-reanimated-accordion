@@ -30,6 +30,8 @@ yarn add react-native-reanimated-animated-accordion
 ## Usage
 
 ```tsx | pure
+import Expandable from 'react-native-reanimated-accordion';
+
 <View
   style={{
     width: '80%',
