@@ -40,13 +40,13 @@
     "ios",
     "android"
   ],
-  "repository": "https://github.com/WadhahEssam/react-native-reanimated-animated-accordion",
+  "repository": "https://github.com/Malaa-tech/react-native-reanimated-accordion",
   "author": "Wadah Esam <wadah-wleed@hotmail.com> (https://github.com/WadhahEssam)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/WadhahEssam/react-native-reanimated-animated-accordion/issues"
+    "url": "https://github.com/Malaa-tech/react-native-reanimated-accordion/issues"
   },
-  "homepage": "https://github.com/WadhahEssam/react-native-reanimated-animated-accordion#readme",
+  "homepage": "https://github.com/Malaa-tech/react-native-reanimated-accordion#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
