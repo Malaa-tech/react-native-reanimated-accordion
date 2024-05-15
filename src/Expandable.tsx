@@ -7,6 +7,7 @@ import Animated, {
   useAnimatedReaction,
   useAnimatedRef,
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
   withDelay,
   withTiming,
@@ -27,6 +28,8 @@ const Expandable = ({
   easing?: EasingFunction | undefined;
   children: JSX.Element | JSX.Element[];
 }) => {
+  const reducedMotion = useReducedMotion();
+
   const [localIsExpanded, setLocalIsExpanded] = React.useState(false);
   const [isCollapsing, setIsCollapsing] = React.useState(false);
   const delay = renderWhenCollapsed ? 100 : 0;
@@ -118,6 +121,10 @@ const Expandable = ({
     },
     [innerComponentHeightSV, localIsExpanded, expanded]
   );
+
+  if (reducedMotion) {
+    return expanded ? children : null;
+  }
 
   return (
     <Animated.View
