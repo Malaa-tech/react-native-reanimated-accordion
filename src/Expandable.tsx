@@ -1,156 +1,93 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react-native/no-inline-styles */
-import React, { LegacyRef, useEffect } from 'react';
-import { EasingFunction, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View } from 'react-native';
 import Animated, {
-  runOnJS,
-  useAnimatedReaction,
-  useAnimatedRef,
   useAnimatedStyle,
-  useReducedMotion,
   useSharedValue,
-  withDelay,
   withTiming,
+  runOnJS,
+  Easing,
 } from 'react-native-reanimated';
 
 const DEFAULT_DURATION = 400;
 
+type EasingFunction = (amount: number) => number;
+
 const Expandable = ({
   expanded = false,
   duration = DEFAULT_DURATION,
-  easing,
   renderWhenCollapsed = true,
+  easing,
   children = <></>,
 }: {
-  expanded?: boolean;
+  expanded: boolean;
   duration?: number;
   renderWhenCollapsed?: boolean;
-  easing?: EasingFunction | undefined;
-  children: JSX.Element | JSX.Element[];
+  easing?: EasingFunction;
+  children: React.ReactNode;
 }) => {
-  const reducedMotion = useReducedMotion();
-
-  const [localIsExpanded, setLocalIsExpanded] = React.useState(false);
-  const [isCollapsing, setIsCollapsing] = React.useState(false);
-  const delay = renderWhenCollapsed ? 100 : 0;
-
-  const heightSV = useSharedValue(0);
-  const opacitySV = useSharedValue(0);
-  const innerComponentHeightSV = useSharedValue(0);
-  const innerComponentRef: LegacyRef<View> = useAnimatedRef();
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      height: heightSV.value,
-      opacity: opacitySV.value,
-    };
-  });
-
-  useEffect(() => {
-    if (expanded !== localIsExpanded) {
-      if (expanded) {
-        expand({ _duration: duration });
-      } else {
-        collapse({ _duration: duration });
-      }
-    }
-  }, [expanded]);
-
-  const expand = ({ _duration = DEFAULT_DURATION }) => {
-    'worklet';
-
-    runOnJS(setLocalIsExpanded)(true);
-    opacitySV.value = withDelay(delay, withTiming(1, { duration }));
-    heightSV.value = withDelay(
-      delay,
-      withTiming(
-        innerComponentHeightSV.value,
-        { duration: _duration, ...(easing ? { easing } : {}) },
-        (finished) => {
-          if (finished) {
-            runOnJS(setLocalIsExpanded)(true);
-          }
-        }
-      )
-    );
-  };
-
-  const collapse = ({ _duration = DEFAULT_DURATION }) => {
-    runOnJS(setLocalIsExpanded)(false);
-    runOnJS(setIsCollapsing)(true);
-    opacitySV.value = withDelay(delay, withTiming(0, { duration }));
-    heightSV.value = withDelay(
-      delay,
-      withTiming(0, { duration: _duration }, (finished) => {
-        if (finished) {
-          runOnJS(setLocalIsExpanded)(false);
-          runOnJS(setIsCollapsing)(false);
-        }
-      })
-    );
-  };
-
-  const shouldRenderElement =
-    renderWhenCollapsed || isCollapsing || localIsExpanded;
-
-  useAnimatedReaction(
-    () => {
-      return {
-        innerHeight: innerComponentHeightSV.value,
-        expanded,
-        localIsExpanded,
-      };
-    },
-    (current, previous) => {
-      // check when the inner component is rendered
-      if (
-        previous?.innerHeight === 0 &&
-        current.innerHeight !== 0 &&
-        expanded
-      ) {
-        expand({ _duration: duration });
-      }
-      if (
-        current.innerHeight !== previous?.innerHeight &&
-        current.localIsExpanded === previous?.localIsExpanded
-      ) {
-        if (current.localIsExpanded) {
-          expand({ _duration: duration });
-        }
-      }
-    },
-    [innerComponentHeightSV, localIsExpanded, expanded]
+  const animatedHeight = useSharedValue(0);
+  const contentHeight = useRef(0);
+  const [measured, setMeasured] = React.useState(false);
+  const [shouldRenderContent, setShouldRenderContent] = React.useState(
+    expanded || renderWhenCollapsed,
   );
 
-  if (reducedMotion) {
-    return expanded ? children : null;
-  }
+  const animatedStyle = useAnimatedStyle(() => ({
+    height: animatedHeight.value,
+    overflow: 'hidden',
+  }));
+
+  const animate = (toValue: number, callback?: () => void) => {
+    animatedHeight.value = withTiming(
+      toValue,
+      {
+        duration,
+        easing: easing || Easing.bezier(0.25, 0.1, 0.25, 1),
+      },
+      finished => {
+        if (finished && callback) {
+          runOnJS(callback)();
+        }
+      },
+    );
+  };
+
+  useEffect(() => {
+    if (measured) {
+      if (expanded) {
+        setShouldRenderContent(true);
+        animate(contentHeight.current);
+      } else {
+        animate(0, () => {
+          if (!renderWhenCollapsed) {
+            setShouldRenderContent(false);
+          }
+        });
+      }
+    }
+  }, [expanded, measured, duration, renderWhenCollapsed, easing]);
 
   return (
-    <Animated.View
-      style={[
-        {
-          overflow: 'hidden',
-          flexDirection: 'column',
-        },
-        animatedStyle,
-      ]}
-    >
-      <View
-        ref={innerComponentRef}
-        style={{ width: '100%', position: 'absolute' }}
-      >
+    <Animated.View style={animatedStyle}>
+      {shouldRenderContent && (
         <View
-          onLayout={(e) => {
-            const { height } = e.nativeEvent.layout;
-            if (height !== 0 && height !== innerComponentHeightSV.value) {
-              innerComponentHeightSV.value = e.nativeEvent.layout.height;
+          style={{ position: 'absolute', width: '100%' }}
+          onLayout={event => {
+            const height = event.nativeEvent.layout.height;
+            if (height !== contentHeight.current) {
+              contentHeight.current = height;
+              if (!measured) {
+                setMeasured(true);
+                if (expanded) {
+                  animatedHeight.value = height;
+                }
+              }
             }
           }}
         >
-          {shouldRenderElement ? children : <></>}
+          {children}
         </View>
-      </View>
+      )}
     </Animated.View>
   );
 };
