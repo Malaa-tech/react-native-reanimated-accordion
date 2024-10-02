@@ -12,71 +12,86 @@ import {
 import Expandable from 'react-native-reanimated-animated-accordion';
 
 const testImage = require('../assets/icon.png');
-
+const NumberField = (props: {
+  value: number;
+  setValue: (p: number) => void;
+  title: string;
+}) => (
+  <View
+    style={{
+      marginBottom: 20,
+      flexDirection: 'row',
+      alignItems: 'center',
+    }}
+  >
+    <Text>{props.title}</Text>
+    <Text style={{ marginStart: 10, fontWeight: '600' }}>{props.value}</Text>
+    <TouchableOpacity
+      onPress={() => {
+        props.setValue(props.value + 100);
+      }}
+      style={{
+        marginStart: 10,
+        width: 30,
+        height: 30,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'pink',
+        borderRadius: 400,
+      }}
+    >
+      <Text
+        style={{
+          fontWeight: '700',
+        }}
+      >
+        +
+      </Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      onPress={() => {
+        if (props.value <= 0) {
+          return props.setValue(0);
+        }
+        props.setValue(props.value - 100);
+      }}
+      style={{
+        marginStart: 10,
+        width: 30,
+        height: 30,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'pink',
+        borderRadius: 400,
+      }}
+    >
+      <Text
+        style={{
+          fontWeight: '700',
+        }}
+      >
+        -
+      </Text>
+    </TouchableOpacity>
+  </View>
+);
 export default function App() {
   const [expanded, setExpanded] = React.useState(false);
-  const [speed, setSpeed] = React.useState(300);
+  const [expandSpeed, setExpandSpeed] = React.useState(300);
+  const [collapseSpeed, setCollapseSpeed] = React.useState(300);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View
-        style={{
-          marginBottom: 20,
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}
-      >
-        <Text>Speed</Text>
-        <Text style={{ marginStart: 10, fontWeight: '600' }}>{speed}</Text>
-        <TouchableOpacity
-          onPress={() => {
-            setSpeed(speed + 100);
-          }}
-          style={{
-            marginStart: 10,
-            width: 30,
-            height: 30,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'pink',
-            borderRadius: 400,
-          }}
-        >
-          <Text
-            style={{
-              fontWeight: '700',
-            }}
-          >
-            +
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            if (speed <= 0) {
-              return setSpeed(0);
-            }
-            setSpeed(speed - 100);
-          }}
-          style={{
-            marginStart: 10,
-            width: 30,
-            height: 30,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'pink',
-            borderRadius: 400,
-          }}
-        >
-          <Text
-            style={{
-              fontWeight: '700',
-            }}
-          >
-            -
-          </Text>
-        </TouchableOpacity>
-      </View>
-
+      <NumberField
+        title="Expand speed"
+        value={expandSpeed}
+        setValue={setExpandSpeed}
+      />
+      <NumberField
+        title="Collapse speed"
+        value={collapseSpeed}
+        setValue={setCollapseSpeed}
+      />
       <View
         style={{
           width: '80%',
@@ -103,8 +118,8 @@ export default function App() {
         </TouchableOpacity>
         <View style={{ width: '100%' }}>
           <Expandable
-            duration={speed}
-            renderWhenCollapsed={false}
+            expandDelay={expandSpeed}
+            collapseDelay={collapseSpeed}
             expanded={expanded}
           >
             <View style={{ width: '100%', padding: 20, paddingTop: 0 }}>
