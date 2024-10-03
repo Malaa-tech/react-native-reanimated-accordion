@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -29,7 +29,7 @@ const Expandable = ({
   collapseDelay?: number;
 }) => {
   const animatedHeight = useSharedValue(0);
-  const contentHeight = useRef(0);
+  const [contentHeight, setContentHeight] = useState(0);
   const [measured, setMeasured] = React.useState(false);
   const [shouldRenderContent, setShouldRenderContent] = React.useState(
     expanded || renderWhenCollapsed
@@ -37,11 +37,7 @@ const Expandable = ({
 
   const animatedStyle = useAnimatedStyle(() => ({
     height: animatedHeight.value,
-    opacity: interpolate(
-      animatedHeight.value,
-      [0, contentHeight.current],
-      [0, 1]
-    ),
+    opacity: interpolate(animatedHeight.value, [0, contentHeight], [0, 1]),
     overflow: 'hidden',
   }));
 
@@ -66,7 +62,7 @@ const Expandable = ({
     if (measured) {
       if (expanded) {
         setShouldRenderContent(true);
-        animate(expandDelay, contentHeight.current);
+        animate(expandDelay, contentHeight);
       } else {
         animate(collapseDelay, 0, () => {
           if (!renderWhenCollapsed) {
@@ -76,6 +72,7 @@ const Expandable = ({
       }
     }
   }, [
+    contentHeight,
     expanded,
     measured,
     expandDelay,
@@ -92,8 +89,8 @@ const Expandable = ({
           style={{ position: 'absolute', width: '100%' }}
           onLayout={(event) => {
             const height = event.nativeEvent.layout.height;
-            if (height !== contentHeight.current) {
-              contentHeight.current = height;
+            if (height !== contentHeight) {
+              setContentHeight(height);
               if (!measured) {
                 setMeasured(true);
                 if (expanded) {
