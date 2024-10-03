@@ -15,8 +15,9 @@ type EasingFunction = (amount: number) => number;
 
 const Expandable = ({
   expanded = false,
-  expandDelay = DEFAULT_DURATION,
-  collapseDelay = DEFAULT_DURATION,
+  duration = DEFAULT_DURATION,
+  expandDuration,
+  collapseDuration,
   renderWhenCollapsed = true,
   easing,
   children = <></>,
@@ -25,8 +26,9 @@ const Expandable = ({
   renderWhenCollapsed?: boolean;
   easing?: EasingFunction;
   children: React.ReactNode;
-  expandDelay?: number;
-  collapseDelay?: number;
+  duration?: number;
+  expandDuration?: number;
+  collapseDuration?: number;
 }) => {
   const animatedHeight = useSharedValue(0);
   const [contentHeight, setContentHeight] = useState(0);
@@ -62,9 +64,9 @@ const Expandable = ({
     if (measured) {
       if (expanded) {
         setShouldRenderContent(true);
-        animate(expandDelay, contentHeight);
+        animate(expandDuration ?? duration, contentHeight);
       } else {
-        animate(collapseDelay, 0, () => {
+        animate(collapseDuration ?? duration, 0, () => {
           if (!renderWhenCollapsed) {
             setShouldRenderContent(false);
           }
@@ -75,8 +77,9 @@ const Expandable = ({
     contentHeight,
     expanded,
     measured,
-    expandDelay,
-    collapseDelay,
+    duration,
+    expandDuration,
+    collapseDuration,
     renderWhenCollapsed,
     easing,
     animate,
