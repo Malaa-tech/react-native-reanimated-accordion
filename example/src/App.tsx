@@ -118,8 +118,8 @@ export default function App() {
         </TouchableOpacity>
         <View style={{ width: '100%' }}>
           <Expandable
-            expandDelay={expandSpeed}
-            collapseDelay={collapseSpeed}
+            expandDuration={expandSpeed}
+            collapseDuration={collapseSpeed}
             expanded={expanded}
           >
             <View style={{ width: '100%', padding: 20, paddingTop: 0 }}>
