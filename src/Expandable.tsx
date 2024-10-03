@@ -31,7 +31,7 @@ const Expandable = ({
   collapseDuration?: number;
 }) => {
   const animatedHeight = useSharedValue(0);
-  const [contentHeight, setContentHeight] = useState(0);
+  const [contentHeight, setContentHeight] = useState(1);
   const [measured, setMeasured] = React.useState(false);
   const [shouldRenderContent, setShouldRenderContent] = React.useState(
     expanded || renderWhenCollapsed
@@ -87,25 +87,23 @@ const Expandable = ({
 
   return (
     <Animated.View style={animatedStyle}>
-      {shouldRenderContent && (
-        <View
-          style={{ position: 'absolute', width: '100%' }}
-          onLayout={(event) => {
-            const height = event.nativeEvent.layout.height;
-            if (height !== contentHeight) {
-              setContentHeight(height);
-              if (!measured) {
-                setMeasured(true);
-                if (expanded) {
-                  animatedHeight.value = height;
-                }
+      <View
+        style={{ position: 'absolute', width: '100%' }}
+        onLayout={(event) => {
+          const height = event.nativeEvent.layout.height;
+          if (height !== contentHeight) {
+            setContentHeight(height);
+            if (!measured) {
+              setMeasured(true);
+              if (expanded) {
+                animatedHeight.value = height;
               }
             }
-          }}
-        >
-          {children}
-        </View>
-      )}
+          }
+        }}
+      >
+        {shouldRenderContent && children}
+      </View>
     </Animated.View>
   );
 };

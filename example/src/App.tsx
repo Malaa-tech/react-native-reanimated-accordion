@@ -121,6 +121,7 @@ export default function App() {
             expandDuration={expandSpeed}
             collapseDuration={collapseSpeed}
             expanded={expanded}
+            renderWhenCollapsed={false}
           >
             <View style={{ width: '100%', padding: 20, paddingTop: 0 }}>
               <Text>
