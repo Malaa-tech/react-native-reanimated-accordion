@@ -9,7 +9,9 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
-import Expandable from 'react-native-reanimated-animated-accordion';
+import Expandable, {
+  useExpandable,
+} from 'react-native-reanimated-animated-accordion';
 
 const testImage = require('../assets/icon.png');
 const NumberField = (props: {
@@ -76,9 +78,9 @@ const NumberField = (props: {
   </View>
 );
 export default function App() {
-  const [expanded, setExpanded] = React.useState(false);
   const [expandSpeed, setExpandSpeed] = React.useState(300);
   const [collapseSpeed, setCollapseSpeed] = React.useState(300);
+  const { ref, toggle } = useExpandable(false);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -110,17 +112,15 @@ export default function App() {
           style={{
             padding: 20,
           }}
-          onPress={() => {
-            setExpanded(!expanded);
-          }}
+          onPress={toggle}
         >
           <Text>Toggle</Text>
         </TouchableOpacity>
         <View style={{ width: '100%' }}>
           <Expandable
+            ref={ref}
             expandDuration={expandSpeed}
             collapseDuration={collapseSpeed}
-            expanded={expanded}
             renderWhenCollapsed={false}
           >
             <View style={{ width: '100%', padding: 20, paddingTop: 0 }}>
