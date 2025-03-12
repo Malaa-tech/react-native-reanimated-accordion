@@ -1,12 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import { View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-  runOnJS,
   Easing,
-  interpolate,
 } from 'react-native-reanimated';
 
 const DEFAULT_DURATION = 400;
@@ -33,57 +31,46 @@ const Expandable = ({
   const animatedHeight = useSharedValue(0);
   const [contentHeight, setContentHeight] = useState(1);
   const [measured, setMeasured] = React.useState(false);
+  const [_, startTransition] = useTransition(); // Prioritized update
+
   const [shouldRenderContent, setShouldRenderContent] = React.useState(
     expanded || renderWhenCollapsed
   );
 
+  const getDurtation = () => {
+    'worklet';
+
+    if (animatedHeight.value === 0) {
+      // will expand
+      return expandDuration || duration;
+    }
+    return collapseDuration || duration;
+  };
+
   const animatedStyle = useAnimatedStyle(() => ({
-    height: animatedHeight.value,
-    opacity: interpolate(animatedHeight.value, [0, contentHeight], [0, 1]),
+    height: withTiming(animatedHeight.value, {
+      duration: getDurtation(),
+      easing: easing || Easing.bezier(0.25, 0.1, 0.25, 1),
+    }),
+    opacity: withTiming(animatedHeight.value === 0 ? 0 : 1, {
+      duration: getDurtation(),
+      easing: easing || easing || Easing.bezier(0.25, 0.1, 0.25, 1),
+    }),
     overflow: 'hidden',
   }));
 
-  const animate = useCallback(
-    (duration: number, toValue: number, callback?: () => void) => {
-      animatedHeight.value = withTiming(
-        toValue,
-        {
-          duration,
-          easing: easing || Easing.bezier(0.25, 0.1, 0.25, 1),
-        },
-        (finished) => {
-          if (finished && callback) {
-            runOnJS(callback)();
-          }
-        }
-      );
-    },
-    [animatedHeight, easing]
-  );
   useEffect(() => {
     if (measured) {
       if (expanded) {
-        setShouldRenderContent(true);
-        animate(expandDuration ?? duration, contentHeight);
-      } else {
-        animate(collapseDuration ?? duration, 0, () => {
-          if (!renderWhenCollapsed) {
-            setShouldRenderContent(false);
-          }
+        startTransition(() => {
+          setShouldRenderContent(true);
         });
+        animatedHeight.value = contentHeight;
+      } else {
+        animatedHeight.value = 0;
       }
     }
-  }, [
-    contentHeight,
-    expanded,
-    measured,
-    duration,
-    expandDuration,
-    collapseDuration,
-    renderWhenCollapsed,
-    easing,
-    animate,
-  ]);
+  }, [contentHeight, expanded, measured, animatedHeight]);
 
   return (
     <Animated.View style={animatedStyle}>
@@ -92,13 +79,15 @@ const Expandable = ({
         onLayout={(event) => {
           const height = event.nativeEvent.layout.height;
           if (height !== contentHeight) {
-            setContentHeight(height);
-            if (!measured) {
-              setMeasured(true);
-              if (expanded) {
-                animatedHeight.value = height;
+            startTransition(() => {
+              setContentHeight(height);
+              if (!measured) {
+                setMeasured(true);
+                if (expanded) {
+                  animatedHeight.value = height;
+                }
               }
-            }
+            });
           }
         }}
       >
