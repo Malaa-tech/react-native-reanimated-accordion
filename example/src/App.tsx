@@ -82,12 +82,35 @@ export default function App() {
   const [collapseSpeed, setCollapseSpeed] = React.useState(300);
   const [selectedEasing, setSelectedEasing] = React.useState<number>(0);
   const easingOptions: { label: string; factory: EasingFunctionFactory }[] = [
-    { label: 'Cubic out', factory: Easing.out(Easing.cubic) as unknown as EasingFunctionFactory },
-    { label: 'Quad in/out', factory: Easing.inOut(Easing.quad) as unknown as EasingFunctionFactory },
-    { label: 'Bezier', factory: Easing.bezier(0.25, 0.1, 0.25, 1.0) as unknown as EasingFunctionFactory },
-    { label: 'Elastic', factory: Easing.elastic(1) as unknown as EasingFunctionFactory },
-    { label: 'Bounce', factory: Easing.bounce as unknown as EasingFunctionFactory },
-    { label: 'Exp in', factory: Easing.in(Easing.exp) as unknown as EasingFunctionFactory },
+    {
+      label: 'Cubic out',
+      factory: Easing.out(Easing.cubic) as unknown as EasingFunctionFactory,
+    },
+    {
+      label: 'Quad in/out',
+      factory: Easing.inOut(Easing.quad) as unknown as EasingFunctionFactory,
+    },
+    {
+      label: 'Bezier',
+      factory: Easing.bezier(
+        0.25,
+        0.1,
+        0.25,
+        1.0
+      ) as unknown as EasingFunctionFactory,
+    },
+    {
+      label: 'Elastic',
+      factory: Easing.elastic(1) as unknown as EasingFunctionFactory,
+    },
+    {
+      label: 'Bounce',
+      factory: Easing.bounce as unknown as EasingFunctionFactory,
+    },
+    {
+      label: 'Exp in',
+      factory: Easing.in(Easing.exp) as unknown as EasingFunctionFactory,
+    },
   ];
   return (
     <ScrollView contentContainerStyle={styles.container}>

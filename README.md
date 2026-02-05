@@ -3,7 +3,7 @@ A simple animated expandable section for react native apps using reanimated
 
 ### 🦄 Features
 - ✅  Customizable
-- ✅  Includes option to not render collapsed compnent. (For less rendring).
+- ✅  Includes option to not render collapsed component (for less rendering).
 - ✅  Uses Reanimated v4
 
 
