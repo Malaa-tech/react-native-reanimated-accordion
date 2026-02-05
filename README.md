@@ -28,9 +28,9 @@ yarn add react-native-reanimated-animated-accordion
 
 | Version | React Native architecture |
 |--------|----------------------------|
-| 0.3.0  | Old architecture           |
+| 0.5.0+ | New architecture only      |
 | 0.4.0  | Old architecture           |
-| 0.5.0+ | New architecture only     |
+| 0.3.0  | Old architecture           |
 
 ## Usage
 
