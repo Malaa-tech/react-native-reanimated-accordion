@@ -1,17 +1,34 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { View } from 'react-native';
+import type { PropsWithChildren } from 'react';
 import Animated, {
+  measure,
+  useAnimatedReaction,
+  useAnimatedRef,
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue,
   withTiming,
-  runOnJS,
   Easing,
-  interpolate,
+  type EasingFunctionFactory,
+  type SharedValue
 } from 'react-native-reanimated';
+import { scheduleOnUI } from 'react-native-worklets';
 
 const DEFAULT_DURATION = 400;
 
-type EasingFunction = (amount: number) => number;
+
+type ExpandableProps = {
+  expanded: boolean;
+  renderWhenCollapsed?: boolean;
+  easing?: EasingFunctionFactory;
+  duration?: number;
+  expandDuration?: number;
+  collapseDuration?: number;
+};
+
+const setMeasuredHeight = (measuredHeight: SharedValue<number>, height: number) => {
+    'worklet';
+    measuredHeight.value = height;
+  };
 
 const Expandable = ({
   expanded = false,
@@ -20,90 +37,59 @@ const Expandable = ({
   collapseDuration,
   renderWhenCollapsed = true,
   easing,
-  children = <></>,
-}: {
-  expanded: boolean;
-  renderWhenCollapsed?: boolean;
-  easing?: EasingFunction;
-  children: React.ReactNode;
-  duration?: number;
-  expandDuration?: number;
-  collapseDuration?: number;
-}) => {
-  const animatedHeight = useSharedValue(0);
-  const [contentHeight, setContentHeight] = useState(1);
-  const [measured, setMeasured] = React.useState(false);
-  const [shouldRenderContent, setShouldRenderContent] = React.useState(
-    expanded || renderWhenCollapsed
-  );
+  children,
+}: PropsWithChildren<ExpandableProps>) => {
+  const contentRef = useAnimatedRef<Animated.View>();
+  const measuredHeight = useSharedValue(0);
+  const expandedValue = useDerivedValue(() => (expanded ? 1 : 0), [expanded]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    height: animatedHeight.value,
-    opacity: interpolate(animatedHeight.value, [0, contentHeight], [0, 1]),
-    overflow: 'hidden',
-  }));
+ 
 
-  const animate = useCallback(
-    (duration: number, toValue: number, callback?: () => void) => {
-      animatedHeight.value = withTiming(
-        toValue,
-        {
-          duration,
-          easing: easing || Easing.bezier(0.25, 0.1, 0.25, 1),
-        },
-        (finished) => {
-          if (finished && callback) {
-            runOnJS(callback)();
-          }
-        }
-      );
-    },
-    [animatedHeight, easing]
-  );
-  useEffect(() => {
-    if (measured) {
-      if (expanded) {
-        setShouldRenderContent(true);
-        animate(expandDuration ?? duration, contentHeight);
-      } else {
-        animate(collapseDuration ?? duration, 0, () => {
-          if (!renderWhenCollapsed) {
-            setShouldRenderContent(false);
-          }
-        });
-      }
+  const measureContent = () => {
+    'worklet';
+    const measured = measure(contentRef);
+    if (measured && measured.height > 0) {
+      setMeasuredHeight(measuredHeight, measured.height);
     }
-  }, [
-    contentHeight,
-    expanded,
-    measured,
-    duration,
-    expandDuration,
-    collapseDuration,
-    renderWhenCollapsed,
-    easing,
-    animate,
-  ]);
+  };
+
+  useAnimatedReaction(
+    () => expandedValue.value,
+    (current, previous) => {
+      if (current === 1 && previous !== 1) {
+        measureContent();
+      }
+    },
+    [],
+  );
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const isExpanding = expandedValue.value === 1;
+    const targetHeight = isExpanding ? measuredHeight.value : 0;
+    const animDuration = isExpanding
+      ? (expandDuration ?? duration)
+      : (collapseDuration ?? duration);
+    const animEasing = easing ?? Easing.out(Easing.cubic);
+    return {
+      height: withTiming(targetHeight, { duration: animDuration, easing: animEasing }),
+      opacity: withTiming(expandedValue.value, { duration: animDuration, easing: animEasing }),
+      overflow: 'hidden',
+    };
+  }, [duration, expandDuration, collapseDuration, easing]);
 
   return (
     <Animated.View style={animatedStyle}>
-      <View
-        style={{ position: 'absolute', width: '100%' }}
-        onLayout={(event) => {
-          const height = event.nativeEvent.layout.height;
-          if (height !== contentHeight) {
-            setContentHeight(height);
-            if (!measured) {
-              setMeasured(true);
-              if (expanded) {
-                animatedHeight.value = height;
-              }
-            }
+      <Animated.View
+        ref={contentRef}
+        onLayout={() => {
+          if (measuredHeight.value === 0) {
+            scheduleOnUI(measureContent);
           }
         }}
+        style={{ position: 'absolute', width: '100%' }}
       >
-        {shouldRenderContent && children}
-      </View>
+        {(expanded || renderWhenCollapsed) && children}
+      </Animated.View>
     </Animated.View>
   );
 };
