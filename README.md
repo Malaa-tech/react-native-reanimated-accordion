@@ -3,15 +3,13 @@ A simple animated expandable section for react native apps using reanimated
 
 ### 🦄 Features
 - ✅  Customizable
-- ✅  Includes option to not render collapsed compnent. (For less rendring).
-- ✅  Uses Reanimated v3
+- ✅  Includes option to not render collapsed component (for less rendering).
+- ✅  Uses Reanimated v4
 
 
-### How we use it
+### How it looks
 <p align="center">
-<img src="https://github.com/Malaa-tech/react-native-reanimated-accordion/assets/24798045/3ab1463f-f200-4f41-943f-7ea74ad20adf" width="270"/>
-<img src="https://github.com/Malaa-tech/react-native-reanimated-accordion/assets/24798045/e613f0f0-261c-448b-b8b3-4f9f428302a8" width="270"/>
-<img src="https://github.com/Malaa-tech/react-native-reanimated-accordion/assets/24798045/3cc703f3-e674-41e0-9489-dae80dd28d52" width="270"/>
+<img src="./assets/Simulator%20Screen%20Recording%20-%20iPhone%2017%20Pro%20-%202026-02-05%20at%2012.27.29.gif" width="280" alt="Accordion demo"/>
 </p>
 
 ## Installation
@@ -26,81 +24,70 @@ yarn add react-native-reanimated-animated-accordion
 
 ⚠️ Make sure you have [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/) installed in your project.
 
+## Version compatibility
+
+| Version | React Native architecture |
+|--------|----------------------------|
+| 0.5.0+ | New architecture only      |
+| 0.4.0  | Old architecture           |
+| 0.3.0  | Old architecture           |
 
 ## Usage
 
-```tsx | pure
+```tsx
+import * as React from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { Easing } from 'react-native-reanimated';
 import Expandable from 'react-native-reanimated-animated-accordion';
 
-<View
-  style={{
-    width: '80%',
-    borderRadius: 20,
-    backgroundColor: 'white',
-    shadowOffset: {
-      height: -2,
-      width: 0,
-    },
-    elevation: 2,
-    shadowRadius: 20,
-    shadowOpacity: 0.07,
-  }}
->
-  <TouchableOpacity
-    style={{
-      padding: 20,
-    }}
-    onPress={() => {
-      setExpanded(!expanded);
-    }}
-  >
-    <Text>Toggle</Text>
-  </TouchableOpacity>
-  <View style={{ width: '100%' }}>
-    <Expandable
-      duration={speed}
-      expanded={expanded}
-    >
-      <View style={{ width: '100%', padding: 20, paddingTop: 0 }}>
-        <Text>
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-          Necessitatibus ab placeat alias commodi voluptatibus possimus
-          ducimus sit repellat praesentium fugit similique aut quam nemo
-          libero, aperiam deleniti modi natus quia!
-        </Text>
-        <Text>
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-          Necessitatibus ab placeat alias commodi voluptatibus possimus
-          ducimus sit repellat praesentium fugit similique aut quam nemo
-          libero, aperiam deleniti modi natus quia!
-        </Text>
+export default function Example() {
+  const [expanded, setExpanded] = React.useState(false);
 
-        <View
-          style={{ marginTop: 20, width: '100%', alignItems: 'center' }}
+  return (
+    <View
+      style={{
+        width: '80%',
+        borderRadius: 20,
+        backgroundColor: 'white',
+        shadowOffset: { height: -2, width: 0 },
+        elevation: 2,
+        shadowRadius: 20,
+        shadowOpacity: 0.07,
+      }}
+    >
+      <TouchableOpacity style={{ padding: 20 }} onPress={() => setExpanded(!expanded)}>
+        <Text>Toggle</Text>
+      </TouchableOpacity>
+      <View style={{ width: '100%' }}>
+        <Expandable
+          expanded={expanded}
+          expandDuration={300}
+          collapseDuration={300}
+          renderWhenCollapsed={false}
+          easing={Easing.out(Easing.cubic)}
         >
-          <Image
-            source={testImage}
-            style={{ height: 100, width: 100, resizeMode: 'contain' }}
-          />
-        </View>
+          <View style={{ width: '100%', padding: 20, paddingTop: 0 }}>
+            <Text>Lorem ipsum dolor sit amet consectetur...</Text>
+          </View>
+        </Expandable>
       </View>
-    </Expandable>
-  </View>
-</View>
+    </View>
+  );
+}
 ```
 
 
 ## Reduce Rendering
-If you would like to prevent collapsed components from being rendered, just add a `renderWhenCollapsed={false}`.
-this can help if you have heavy collapsed compoennts as it may reduce your boot time + ram.
+If you would like to prevent collapsed components from being rendered, add `renderWhenCollapsed={false}`. This can help if you have heavy collapsed components (e.g. reduces boot time and RAM).
 
-```tsx | pure
+```tsx
 <Expandable
-  duration={speed}
-  renderWhenCollapsed={false}
   expanded={expanded}
+  expandDuration={300}
+  collapseDuration={300}
+  renderWhenCollapsed={false}
 >
-//
+  {/* your content */}
 </Expandable>
 ```
 

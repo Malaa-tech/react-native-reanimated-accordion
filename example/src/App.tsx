@@ -9,6 +9,7 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
+import { Easing, type EasingFunctionFactory } from 'react-native-reanimated';
 import Expandable from 'react-native-reanimated-animated-accordion';
 
 const testImage = require('../assets/icon.png');
@@ -79,7 +80,38 @@ export default function App() {
   const [expanded, setExpanded] = React.useState(false);
   const [expandSpeed, setExpandSpeed] = React.useState(300);
   const [collapseSpeed, setCollapseSpeed] = React.useState(300);
-
+  const [selectedEasing, setSelectedEasing] = React.useState<number>(0);
+  const easingOptions: { label: string; factory: EasingFunctionFactory }[] = [
+    {
+      label: 'Cubic out',
+      factory: Easing.out(Easing.cubic) as unknown as EasingFunctionFactory,
+    },
+    {
+      label: 'Quad in/out',
+      factory: Easing.inOut(Easing.quad) as unknown as EasingFunctionFactory,
+    },
+    {
+      label: 'Bezier',
+      factory: Easing.bezier(
+        0.25,
+        0.1,
+        0.25,
+        1.0
+      ) as unknown as EasingFunctionFactory,
+    },
+    {
+      label: 'Elastic',
+      factory: Easing.elastic(1) as unknown as EasingFunctionFactory,
+    },
+    {
+      label: 'Bounce',
+      factory: Easing.bounce as unknown as EasingFunctionFactory,
+    },
+    {
+      label: 'Exp in',
+      factory: Easing.in(Easing.exp) as unknown as EasingFunctionFactory,
+    },
+  ];
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <NumberField
@@ -92,6 +124,34 @@ export default function App() {
         value={collapseSpeed}
         setValue={setCollapseSpeed}
       />
+      <View style={{ marginBottom: 20, width: '80%' }}>
+        <Text style={{ marginBottom: 8, fontWeight: '600' }}>Easing</Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          {easingOptions.map((opt, i) => (
+            <TouchableOpacity
+              key={opt.label}
+              onPress={() => setSelectedEasing(i)}
+              style={{
+                paddingVertical: 8,
+                paddingHorizontal: 12,
+                borderRadius: 8,
+                backgroundColor: selectedEasing === i ? '#6366f1' : 'white',
+                borderWidth: 1,
+                borderColor: selectedEasing === i ? '#6366f1' : '#e5e7eb',
+              }}
+            >
+              <Text
+                style={{
+                  fontWeight: selectedEasing === i ? '600' : '400',
+                  color: selectedEasing === i ? 'white' : '#374151',
+                }}
+              >
+                {opt.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
       <View
         style={{
           width: '80%',
@@ -122,6 +182,7 @@ export default function App() {
             collapseDuration={collapseSpeed}
             expanded={expanded}
             renderWhenCollapsed={false}
+            easing={easingOptions[selectedEasing]?.factory}
           >
             <View style={{ width: '100%', padding: 20, paddingTop: 0 }}>
               <Text>
@@ -158,6 +219,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 100,
     alignItems: 'center',
+    backgroundColor: 'whitesmoke',
   },
   box: {
     width: 60,
