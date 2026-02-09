@@ -9,7 +9,11 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
-import { Easing, type EasingFunctionFactory } from 'react-native-reanimated';
+import {
+  Easing,
+  type EasingFunction,
+  type EasingFunctionFactory,
+} from 'react-native-reanimated';
 import Expandable from 'react-native-reanimated-animated-accordion';
 
 const testImage = require('../assets/icon.png');
@@ -81,35 +85,33 @@ export default function App() {
   const [expandSpeed, setExpandSpeed] = React.useState(300);
   const [collapseSpeed, setCollapseSpeed] = React.useState(300);
   const [selectedEasing, setSelectedEasing] = React.useState<number>(0);
-  const easingOptions: { label: string; factory: EasingFunctionFactory }[] = [
+  const easingOptions: {
+    label: string;
+    factory: EasingFunction | EasingFunctionFactory;
+  }[] = [
     {
       label: 'Cubic out',
-      factory: Easing.out(Easing.cubic) as unknown as EasingFunctionFactory,
+      factory: Easing.out(Easing.cubic),
     },
     {
       label: 'Quad in/out',
-      factory: Easing.inOut(Easing.quad) as unknown as EasingFunctionFactory,
+      factory: Easing.inOut(Easing.quad),
     },
     {
       label: 'Bezier',
-      factory: Easing.bezier(
-        0.25,
-        0.1,
-        0.25,
-        1.0
-      ) as unknown as EasingFunctionFactory,
+      factory: Easing.bezier(0.25, 0.1, 0.25, 1.0),
     },
     {
       label: 'Elastic',
-      factory: Easing.elastic(1) as unknown as EasingFunctionFactory,
+      factory: Easing.elastic(1),
     },
     {
       label: 'Bounce',
-      factory: Easing.bounce as unknown as EasingFunctionFactory,
+      factory: Easing.bounce,
     },
     {
       label: 'Exp in',
-      factory: Easing.in(Easing.exp) as unknown as EasingFunctionFactory,
+      factory: Easing.in(Easing.exp),
     },
   ];
   return (

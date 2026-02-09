@@ -10,6 +10,7 @@ import Animated, {
   Easing,
   type EasingFunctionFactory,
   type SharedValue,
+  type EasingFunction,
 } from 'react-native-reanimated';
 import { scheduleOnUI } from 'react-native-worklets';
 
@@ -18,7 +19,7 @@ const DEFAULT_DURATION = 400;
 type ExpandableProps = {
   expanded: boolean;
   renderWhenCollapsed?: boolean;
-  easing?: EasingFunctionFactory;
+  easing?: EasingFunction | EasingFunctionFactory;
   duration?: number;
   expandDuration?: number;
   collapseDuration?: number;
